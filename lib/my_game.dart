@@ -19,13 +19,15 @@ class MyGame extends FlameGame with TapDetector, HasCollisionDetection {
   final List<SpriteComponent> bases = [];
 
   final Function() onGameOver;
-  final String birdColor; // <-- added to allow color selection
+  final String birdColor;
+  final String pipeColor; // <-- added for pipe color
 
   final Random random = Random();
 
   MyGame({
     required this.onGameOver,
-    this.birdColor = 'yellow', // <-- default to yellow
+    this.birdColor = 'yellow',
+    this.pipeColor = 'green', // <-- default to green
   });
 
   @override
@@ -33,7 +35,6 @@ class MyGame extends FlameGame with TapDetector, HasCollisionDetection {
     super.onLoad();
 
     final sprite = await loadSprite('background-day.png');
-    Pipe.pipeSprite ??= await loadSprite('pipe-green.png');
 
     final imageSize = sprite.srcSize;
     final bgWidth = imageSize.x;
@@ -58,17 +59,19 @@ class MyGame extends FlameGame with TapDetector, HasCollisionDetection {
       size: Vector2(50, 35),
       bottom: (size.y - baseSprite.srcSize.y / 2),
       onGameOver: onGameOver,
-      birdColor: birdColor, // <-- passed to Bird
+      birdColor: birdColor,
     )..debugMode = true;
 
     add(character);
 
-    Pipe pipe = Pipe(
+    final demoPipe = Pipe(
       position: Vector2(size.x / 2, size.y / 2),
       size: Vector2(55, 100),
+      pipeColor: pipeColor,
     )..debugMode = true;
 
-    add(pipe);
+    add(demoPipe);
+
     reloadBases();
   }
 
@@ -112,8 +115,8 @@ class MyGame extends FlameGame with TapDetector, HasCollisionDetection {
   }
 
   void spawnPipes() {
-    final pipeWidth = Pipe.pipeSprite!.srcSize.x;
-    final pipeHeight = Pipe.pipeSprite!.srcSize.y;
+    final pipeWidth = 55.0;
+    final pipeHeight = 320.0; // approx. asset height
 
     final gap = 100.0;
     final baseHeight = 20.0;
@@ -128,6 +131,7 @@ class MyGame extends FlameGame with TapDetector, HasCollisionDetection {
       position: Vector2(size.x + pipeWidth / 2, bottomPipeCenterY),
       size: Vector2(pipeWidth, pipeHeight),
       isTop: false,
+      pipeColor: pipeColor,
     )..debugMode = true;
     add(bottomPipe);
 
@@ -135,6 +139,7 @@ class MyGame extends FlameGame with TapDetector, HasCollisionDetection {
       position: Vector2(size.x + pipeWidth / 2, topPipeCenterY),
       size: Vector2(pipeWidth, pipeHeight),
       isTop: true,
+      pipeColor: pipeColor,
     )..debugMode = true;
     add(topPipe);
   }

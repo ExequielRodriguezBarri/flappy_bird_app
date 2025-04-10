@@ -1,16 +1,20 @@
 import 'dart:async';
-
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 import 'my_game.dart';
 
-class Pipe extends SpriteComponent {
+class Pipe extends SpriteComponent with HasGameRef<MyGame> {
   final bool isTop;
-  static Sprite? pipeSprite;
+  final String pipeColor;
+  static final Map<String, Sprite> _pipeSprites = {};
 
-  Pipe({required Vector2 position, required Vector2 size, this.isTop = false})
-      : super(
+  Pipe({
+    required Vector2 position,
+    required Vector2 size,
+    this.isTop = false,
+    this.pipeColor = 'green',
+  }) : super(
           position: position,
           size: size,
           anchor: Anchor.center,
@@ -18,7 +22,12 @@ class Pipe extends SpriteComponent {
 
   @override
   Future<void> onLoad() async {
-    sprite = pipeSprite;
+    if (!_pipeSprites.containsKey(pipeColor)) {
+      _pipeSprites[pipeColor] =
+          await gameRef.loadSprite('pipe-$pipeColor.png');
+    }
+
+    sprite = _pipeSprites[pipeColor];
 
     if (isTop) {
       scale.y = -1;
